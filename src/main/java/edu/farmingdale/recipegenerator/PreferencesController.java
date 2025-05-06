@@ -38,7 +38,7 @@ public class PreferencesController {
     private TextArea allergiesTextArea,notesTextArea;
 
     @FXML
-    private ComboBox<String> skillsComboBox,portionSizeComboBox,cokingTimeComboBox,flavorComboBox,messComboBox;
+    private ComboBox<String> skillsComboBox,portionSizeComboBox,cookingTimeComboBox,flavorComboBox,messComboBox;
     @FXML
     private Label dietaryPreferencesLabel,mealTypeLabel,spiceLevelLabel,skillsLabel,foodStyleLabel,allergiesLabel,portionSizeLabel,numServingLabel,cokingTimeLabel,flavorLabel,messLabel,notesLabel;
     @FXML
@@ -72,85 +72,64 @@ public class PreferencesController {
 
     @FXML
     public void initialize() {
-        // 1) Parse the prefs JSON as an object, not an array
+        // 1) Parse the prefs JSON
         String json = SessionManager.getInstance()
                 .getCurrentUser()
                 .getPreferencesJson();
         JSONObject prefs = new JSONObject(json);
 
         // 2) Populate your controls
-        foodStyleComboBox.getItems().addAll("None","Italian", "Chinese", "Mexican", "Indian", "American","Japanese");
-        dietaryPreferencesComboBox.getItems().addAll("None","Vegetarian", "Vegan", "Gluten-Free"," Dairy-Free");
-        mealTypeComboBox.getItems().addAll("None","Breakfast", "Lunch", "Dinner", "Snack");
-        spiceLevelSlider.getItems().addAll(0,1,2,3,4,5,6,7,8,9,10);
+        spiceLevelSlider.getItems().addAll(1,2,3,4,5,6,7,8,9,10);
+        foodStyleComboBox.getItems().addAll("None","Italian","Chinese","Mexican","Indian","American","Japanese");
+        dietaryPreferencesComboBox.getItems().addAll("None","Vegetarian","Vegan","Gluten-Free","Dairy-Free");
+        mealTypeComboBox.getItems().addAll("None","Breakfast","Lunch","Dinner","Snack");
         skillsComboBox.getItems().addAll("None","Beginner","Intermediate","Advanced");
         portionSizeComboBox.getItems().addAll("None","Small","Medium","Large");
-        numServingComboBox.getItems().addAll(1,2,3,4,5,6,7,8,9,10);
-        cokingTimeComboBox.getItems().addAll("None","15min","30min","1hour","2hours");
+        cookingTimeComboBox.getItems().addAll("None","15min","30min","1hour","2hours");
         flavorComboBox.getItems().addAll("None","sweet","salty","sour","bitter","umami");
-        messComboBox.getItems().addAll("None","Minimal","Medium","Doesn’t matter");
+        messComboBox.getItems().addAll("Minimal","Medium","Doesn’t matter");
+        numServingComboBox.getItems().addAll(1,2,3,4,5,6,7,8,9,10);
 
-
-//        spiceLevelSlider.setMin(0);
-//        spiceLevelSlider.setMax(10);
-//        spiceLevelSlider.setShowTickLabels(true);
-//        spiceLevelSlider.setShowTickMarks(true);
-//        spiceLevelSlider.setMajorTickUnit(1);
-//        spiceLevelSlider.setSnapToTicks(true);
-
-        // 3) Read out the saved values
-        String savedFoodStyle = prefs.optString("foodStyle", "None");
-        String savedDietaryPreference = prefs.optString("dietaryPreference", "None");
-        String savedMealType = prefs.optString("mealType", "None");
-        int savedSpiceLevel = prefs.optInt("spiceLevel", 0);
+        // 3) Read out the saved values (with defaults)
+        String sf = prefs.optString("foodStyle",        "None");
+        String sd = prefs.optString("dietaryPreference","None");
+        String sm = prefs.optString("mealType",         "None");
+        int    sp = prefs.optInt   ("spiceLevel",        0);
+        String sk = prefs.optString("cookingSkill",     "None");
+        String ps = prefs.optString("portionSize",      "None");
+        String ct = prefs.optString("cookingTime",      "None");
+        String fp = prefs.optString("flavorProfile",    "None");
+        String ce = prefs.optString("cleanupEffort",    "None");
+        int    ns = prefs.optInt   ("numberOfServings",  1);
+        String al = prefs.optString("allergies",        "");
+        String ad = prefs.optString("additionalNotes",  "");
 
         // 4) Apply them to the UI
-        if (savedFoodStyle != null) {
-            foodStyleComboBox.getSelectionModel().select(savedFoodStyle);
-        }
-        if (savedDietaryPreference != null) {
-            dietaryPreferencesComboBox.getSelectionModel().select(savedDietaryPreference);
-        }
-        if (savedMealType != null) {
-            mealTypeComboBox.getSelectionModel().select(savedMealType);
-        }
-        spiceLevelSlider.setValue(savedSpiceLevel);
+        foodStyleComboBox.getSelectionModel().select(sf);
+        dietaryPreferencesComboBox.getSelectionModel().select(sd);
+        mealTypeComboBox.getSelectionModel().select(sm);
+        spiceLevelSlider.setValue(sp);
+        skillsComboBox.getSelectionModel().select(sk);
+        portionSizeComboBox.getSelectionModel().select(ps);
+        cookingTimeComboBox.getSelectionModel().select(ct);
+        flavorComboBox.getSelectionModel().select(fp);
+        messComboBox.getSelectionModel().select(ce);
+        numServingComboBox.getSelectionModel().select(Integer.valueOf(ns));
+        allergiesTextArea.setText(al);
+        notesTextArea.setText(ad);
 
-        // 5) (Optional) load background image as before
-        Image image = new Image(Objects.requireNonNull(
+        // 5) (Optional) load & bind a background image
+        Image img = new Image(Objects.requireNonNull(
                 getClass().getResourceAsStream("/images/preferences.png")));
-
-        backgroundImageView.setImage(image);
-//        backgroundImageView.setPreserveRatio(true);
+        backgroundImageView.setImage(img);
+        //backgroundImageView.setPreserveRatio(true);
         backgroundImageView.setFitWidth(anchorPane.getWidth());
         backgroundImageView.setFitHeight(anchorPane.getHeight());
-
-        anchorPane.widthProperty().addListener((obs, o, n) ->
-                backgroundImageView.setFitWidth(n.doubleValue()));
-        anchorPane.heightProperty().addListener((obs, o, n) ->
-                backgroundImageView.setFitHeight(n.doubleValue()));
-
-
+        anchorPane.widthProperty().addListener((o,oldN,newN) ->
+                backgroundImageView.setFitWidth(newN.doubleValue()));
+        anchorPane.heightProperty().addListener((o,oldN,newN) ->
+                backgroundImageView.setFitHeight(newN.doubleValue()));
     }
-
-//    @FXML
-//    private void handleAddIngredient() {
-//        String ingredient = ingredientsAvailableField.getText().trim();
-//        if (!ingredient.isEmpty()) {
-//            Label ingredientLabel = new Label(ingredient);
-//            ingredientLabel.setStyle("-fx-background-color: rgba(255, 255, 255, 0.7); -fx-padding: 8 12; -fx-background-radius: 10; -fx-text-fill: black;");
-//
-//            ingredientsGrid.add(ingredientLabel, column, row);
-//
-//            column++;
-//            if (column == 4) { // adjust grid width as needed
-//                column = 0;
-//                row++;
-//            }
-//
-//            ingredientsAvailableField.clear();
-//        }
-//    }
 
     @FXML
     private void handleContinueButtonAction() {
@@ -161,7 +140,7 @@ public class PreferencesController {
         int spiceLevel = spiceLevelSlider.getValue() != null ? spiceLevelSlider.getValue() : 0;
         String selectedSkills = skillsComboBox.getValue() != null ? skillsComboBox.getValue() : "";
         String portionSelected = portionSizeComboBox.getValue() != null ? portionSizeComboBox.getValue() : "";
-        String cookingTimeSelected = cokingTimeComboBox.getValue() != null ? cokingTimeComboBox.getValue() : "";
+        String cookingTimeSelected = cookingTimeComboBox.getValue() != null ? cookingTimeComboBox.getValue() : "";
         String flavorSelected = flavorComboBox.getValue() != null ? flavorComboBox.getValue() : "";
         String messSelected = messComboBox.getValue() != null ? messComboBox.getValue() : "";
         int numberOfServingsSelected = numServingComboBox.getValue() != null ? numServingComboBox.getValue() : 1;
@@ -206,8 +185,7 @@ public class PreferencesController {
     }
     private void openMainWindow() {
         try {
-            Stage stage = (Stage) mealTypeComboBox.getScene().getWindow();
-            stage.close();  // Close the login window
+            // Close the login window
 
             // Load the main scene (your fridge management window)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/edu/farmingdale/recipegenerator/hello-view.fxml"));
@@ -226,6 +204,7 @@ public class PreferencesController {
             newStage.setScene(scene);
             newStage.setTitle("Flavor Bot");
             newStage.show();
+            ((Stage) mealTypeComboBox.getScene().getWindow()).close();
 
         } catch (Exception e) {
             e.printStackTrace();

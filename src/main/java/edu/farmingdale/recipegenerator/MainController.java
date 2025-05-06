@@ -103,9 +103,6 @@ public class MainController {
     @FXML
     private void openPreferencesWindow() {
         try {
-            Stage currentStage = (Stage) preferencesButton.getScene().getWindow();
-
-            currentStage.close();
 
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/edu/farmingdale/recipegenerator/preferences.fxml")
@@ -125,6 +122,7 @@ public class MainController {
             prefStage.setScene(scene);
 //            prefStage.setMaximized(true);
             prefStage.show();
+            ((Stage) preferencesButton.getScene().getWindow()).close();
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Could not load preferences window.", Alert.AlertType.ERROR);
